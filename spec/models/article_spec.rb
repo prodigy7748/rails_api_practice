@@ -22,7 +22,7 @@ RSpec.describe Article, type: :model do
       expect(article.errors[:slug]).to include("can't be blank")
     end
 
-    it "has a slug been taken" do
+    it "shouldn't shoulhas a slug been taken" do
       article1 = create(:article)
       expect(article1).to be_valid
       article2 = build(:article, slug: article1.slug)
