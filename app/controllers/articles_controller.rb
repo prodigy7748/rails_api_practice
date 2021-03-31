@@ -1,5 +1,5 @@
 class ArticlesController < ApplicationController
   def index
-    render json: Article.all.order("id desc"), status: :ok
+    render json: Article.created_desc.page(params[:page]), status: :ok
   end
 end
