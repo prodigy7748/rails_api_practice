@@ -37,11 +37,11 @@ RSpec.describe ArticlesController do
       create_list(:article, 26)
       get "/articles", params: { page: 2 }
       expect(json_data.length).to eq(1)
+      expect(json_data.first[:id]).to eq(Article.first.id.to_s)
       expect(json[:links].length).to eq(5)
       expect(json[:links].keys).to contain_exactly(
         :self, :first, :prev, :next, :last
       )
-      expect(json_data.first[:id]).to eq(Article.first.id.to_s)
     end
 
     it "contains pagination links in the response" do
@@ -50,6 +50,39 @@ RSpec.describe ArticlesController do
       expect(json[:links].keys).to contain_exactly(
         :self, :first, :prev, :next, :last
       )
+    end
+  end
+
+  describe "#show" do
+    let(:article) { create :article }
+
+    subject { get "/articles/#{article.id}" }
+
+    before { subject }
+
+    it "should return a success response" do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "should return a proper JSON" do
+      aggregate_failures do
+        expect(json_data[:id]).to eq(article.id.to_s)
+        expect(json_data[:type]).to eq('articles')
+        expect(json_data[:attributes]).to eq(
+          title: article.title,
+          content: article.content,
+          slug: article.slug
+        )
+      end
+    end
+
+    it "should return error message for object not found" do
+      create(:article)
+      get '/articles/2'
+      expect(response).to have_http_status(404)
+      expect(json).to eq({
+        "message": "We Couldn't find the object you were looking for!"
+      })
     end
   end
 end
