@@ -40,6 +40,17 @@ describe UserAuthenticator do
         expect{ subject }.to change{ User.count }.by(1)
         expect( User.last.name ).to eq("Phil Lee")
       end
+
+      it "should reuse user already exist" do
+        user = create(:user, user_data)
+        expect{ subject }.not_to change{ User.count }
+        expect(authenticator.user).to eq(user)
+      end
+
+      it "should create and set user's access_token" do
+        expect{ subject }.to change{ AccessToken.count }.by(1)
+        expect(authenticator.access_token).to be_present
+      end
     end
   end
 end
