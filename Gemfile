@@ -43,4 +43,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'active_model_serializers', '~> 0.10.12'
 gem 'kaminari', '~> 1.2', '>= 1.2.1'
+gem 'octokit', '~> 4.20'
 
