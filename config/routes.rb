@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  post 'login', to: "access_tokens#create"
-  resources :articles, only: [:index, :show]
-  root to: 'articles#index'
+  post "login", to: "access_tokens#create"
+  delete "logout", to: "access_tokens#destroy"
+  resources :articles, only: [:index, :show, :create]
+  root to: "articles#index"
 end

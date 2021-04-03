@@ -2,27 +2,6 @@ require 'rails_helper'
 
 RSpec.describe AccessTokensController, type: :controller do
   describe '#create' do
-    shared_examples_for "unauthorized_requests" do
-      let(:error) do
-        {
-          "status" => "401",
-          "source" => { "pointer" => "/code" },
-          "title" =>  "Authentication code is invalid",
-          "detail" => "You must provide valid code in order to exchange it for token."
-        }
-      end
-
-      it 'should return 401 status code' do
-        subject
-        expect(response).to have_http_status(401)
-      end
-
-      it 'should return proper error body' do
-        subject
-        expect(json[:errors]).to include(error.deep_symbolize_keys)
-      end
-    end
-
     context 'when no code provided' do
       subject { post :create }
       it_behaves_like "unauthorized_requests"
@@ -70,6 +49,35 @@ RSpec.describe AccessTokensController, type: :controller do
         expect(json_data[:attributes]).to eq(
           { "token" => user.access_token.token }.deep_symbolize_keys
         )
+      end
+    end
+  end
+
+  describe "#destroy" do
+    subject { delete :destroy }
+
+    context "when no authorization header provided" do
+      it_behaves_like "forbidden_request"
+    end
+
+    context "when invalid authorization header provided" do
+      before { request.headers["authorization"] = "Invalid_token" }
+      it_behaves_like "forbidden_request"
+    end
+
+    context "when valid request" do
+      let(:user) { create :user }
+      let(:access_token) { user.create_access_token }
+
+      before { request.headers["authorization"] = "Bearer #{access_token.token}" }
+
+      it "should return 204 status" do
+        subject
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it "should remove right access token" do
+        expect{ subject }.to change{ AccessToken.count }.by(-1)
       end
     end
   end
