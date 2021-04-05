@@ -1,5 +1,7 @@
 class ArticlesController < ApplicationController
   before_action :set_article, only: [:show]
+  before_action :authorize!, only: :create
+
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
   def index
@@ -8,6 +10,9 @@ class ArticlesController < ApplicationController
 
   def show
     render json: @article
+  end
+
+  def create
   end
 
   private
